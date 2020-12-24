@@ -8,6 +8,7 @@ screen_width = 500
 screen_height = 500
 
 screen = pygame.display.set_mode([screen_width, screen_height])
+
     
 def adjust_pos(x, y, direction):
     if direction == "SE":
@@ -89,7 +90,8 @@ def check_space_bar(cur_pos, s_pos, cur_direction):
                     if (x > sx) and (x < sx+bx_change+x_change):
                         side1 -= ((x+bx_change+x_change) - (sx+bx_change+x_change))
             can_space = False
-            s_root_chord, s_side1, s_side2 = generate_new_stack(cur_pos, side1, side2)
+            print(side1, side2)
+            generate_new_stack(cur_pos, side1, side2)
             return True
     else:
         return False
@@ -105,29 +107,49 @@ def find_starting_coord(movement_speed, stack_x, stack_y, stack_depth):
 
 def generate_new_stack(pos, side1, side2):
     global previous_stack_info
-
     x, y = pos
-    previous_stack_info.append(((x + s_depth, y + s_depth), side1, side2))
-    return pos, side1, side2
+    temp_info = []
+    print(previous_stack_info)
+    count = 0
+    for info in previous_stack_info:
+        sx, sy = info[count]
+        temp_info.append(((sx, sy+s_depth), info[1], info[2]))
+        temp_info.insert(0, ((sx, sy), side1, side2))
+        count += 1
+    previous_stack_info = temp_info
 
-count = 4
+def analyse_info():
+    for info in previous_stack_info:
+        x, y = info[0]
+        if check_space_bar(root_coord, previous_stack_info[0][0], cur_direction) == True:
+            print("Hello")
+            print(previous_stack_info)
+            previous_stack_coords.append(find_coords((x, y), s_angle1, s_angle2, info[1], info[2]))
+        else:
+            previous_stack_coords.append(find_coords((x, y), s_angle1, s_angle2, info[1], info[2]))
+    
+    for stack_coords in previous_stack_coords:
+        draw_cuboid(stack_coords, s_depth)
+    previous_stack_coords.clear()
+
+
 running = True
 directions = ["SE", "SW", "NE", "NW"]
 cur_direction = directions[0]
 can_space = True
 time_speed = 0.05
 movement_speed = 5
-count = 0
 
 #~ Stack's rect attributes
-s_root_coord = (200, 250)
+previous_stack_info = [((200, 250), 50, 60)]
+previous_stack_coords = []
+s_root_coord = previous_stack_info[0][0]
 s_angle1 = 40
 s_angle2 = 80
 s_side1 = 50
 s_side2 = 60
 s_depth = 20
-previous_stack_info = [((200, 250), 50, 60)]
-previous_stack_coords = []
+
 
 #~ Moving rects attributes
 #~ root_coord = (15, 40)
@@ -138,8 +160,6 @@ side1 = 50
 side2 = 60
 depth = 20
 
-
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -147,23 +167,10 @@ while running:
         
     screen.fill([0, 0, 0])
     pygame.display.set_caption("Stack 3D")
-    check_space_bar(root_coord, s_root_coord, cur_direction)
     root_coord = adjust_pos(root_coord[0], root_coord[1], cur_direction)
     coords = find_coords(root_coord, angle1, angle2, side1, side2)
-    
-    for info in previous_stack_info:
-        x, y = info[0]
-        if check_space_bar(root_coord, s_root_coord, cur_direction) == True:
-            previous_stack_coords.append(find_coords((x, y), s_angle1, s_angle2, info[1], info[2]))
-            count += 1
-        else:
-            previous_stack_coords.append(find_coords((x, y), s_angle1, s_angle2, info[1], info[2]))
-               
-    
-    cur_direction = check_if_hit_edge(root_coord[0], root_coord[1], cur_direction)
-    for stack_coords in previous_stack_coords:
-        draw_cuboid(stack_coords, s_depth)
+    analyse_info()    
     draw_cuboid(coords, depth)
-    
+    cur_direction = check_if_hit_edge(root_coord[0], root_coord[1], cur_direction)
     time.sleep(.05)
     pygame.display.flip()
