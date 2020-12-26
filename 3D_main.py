@@ -15,7 +15,7 @@ from pygame.locals import *
 
 pygame.init()
 
-screen_width = 500
+screen_width = 300
 screen_height = 500
 
 screen = pygame.display.set_mode([screen_width, screen_height])
@@ -108,7 +108,6 @@ def check_space_bar(cur_pos, s_pos):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 print(cur_direction)
-                # cur_direction = change_direction(cur_direction, "space")
                 if cur_direction in ("SE", "NW"):
                     if (x < sx) and (x+bx_change+x_change > sx):
                         side1 -= (sx - x)
@@ -117,16 +116,17 @@ def check_space_bar(cur_pos, s_pos):
                         side1 -= ((x+bx_change+x_change) - (sx+bx_change+x_change))
                         score += 1
                     else:
-                         score = 0
+                        score = 0
                 if cur_direction in ("SW", "NE"):
                     if (x < sx) and (x+bx_change+x_change > sx):
-                        side1 -= (sx - x)
+                        side2 -= (sx - x)
                         score += 1
                     elif (x > sx) and (x < sx+bx_change+x_change):
-                        side1 -= ((x+bx_change+x_change) - (sx+bx_change+x_change))
+                        side2 -= ((x+bx_change+x_change) - (sx+bx_change+x_change))
                         score += 1
                     else:
-                         score = 0
+                        score = 0
+            cur_direction = change_direction(cur_direction, "space")
             print(cur_direction)
             can_space = False
             generate_new_stack(cur_pos, side1, side2)
@@ -172,6 +172,9 @@ def analyse_info():
         draw_cuboid(stack_coords, s_depth)
     previous_stack_coords.clear()
 
+def calc_stack_start_coord():
+    return screen_width/2-(screen_width/10), screen_height/2
+
 def draw_score():
    screen.blit(text, (20, 20))
 
@@ -187,7 +190,7 @@ font = pygame.font.SysFont("Rockwell", 32)
 text = font.render(str(score), True, (255, 255, 255))
 
 #~ Stack's rect attributes
-previous_stack_info = [((200, 250), 50, 60)]
+previous_stack_info = [(calc_stack_start_coord(), 50, 60)]
 previous_stack_coords = []
 s_root_coord = previous_stack_info[0][0]
 s_angle1 = 40
