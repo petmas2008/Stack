@@ -127,7 +127,6 @@ def check_space_bar(cur_pos, s_pos):
                     else:
                         score = 0
             cur_direction = change_direction(cur_direction, "space")
-            print(cur_direction)
             can_space = False
             generate_new_stack(cur_pos, side1, side2)
             return True
