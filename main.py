@@ -128,6 +128,4 @@ while running:
     screen.blit(text1, (20, 20))
     pygame.display.flip()
 
-    
-
 pygame.quit()
